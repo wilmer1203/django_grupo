@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User
-
+from django.conf import settings
 
 # Create your models here.
 class UsuarioPersonalizado(AbstractUser):
@@ -9,7 +9,7 @@ class UsuarioPersonalizado(AbstractUser):
     es_administrador = models.BooleanField(default=False)
     
 class Estudiante(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Relación con usuario
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Relación con usuario
     numero_identificacion = models.CharField(max_length=20, unique=True)
     fecha_nacimiento = models.DateField(blank=True, null=True)
 
@@ -19,7 +19,7 @@ class Estudiante(models.Model):
 class Curso(models.Model):
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=10, unique=True)
-    profesor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    profesor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.nombre
