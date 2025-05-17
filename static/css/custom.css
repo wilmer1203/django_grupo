@@ -1,0 +1,47 @@
+/* Colores institucionales */
+:root {
+    --dark-red: #8C1515;
+    --hover-red: #6a0f0f;
+}
+
+.bg-dark-red {
+    background-color: var(--dark-red) !important;
+}
+
+.btn-dark-red {
+    background-color: var(--dark-red);
+    color: white;
+}
+
+.btn-dark-red:hover {
+    background-color: var(--hover-red);
+    color: white;
+}
+
+/* Tablas responsivas */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+.bg-dark-red { background-color: #8C1515; }
+.text-dark-red { color: #8C1515; }
+.btn-outline-dark-red { 
+    border-color: #8C1515;
+    color: #8C1515;
+}
+.btn-outline-dark-red:hover {
+    background-color: #8C1515;
+    color: white;
+}
+
+.logout-card {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

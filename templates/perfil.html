@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Perfil del Estudiante{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-dark-red">Perfil Académico</h1>
+        </div>
+    </div>
+
+    <!-- Sección Superior: Información Básica -->
+    <div class="row mb-5">
+        <!-- Tarjeta de Información Personal -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-header bg-dark-red text-white">
+                    <h5 class="mb-0">Datos Personales</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{% if estudiante.foto %}{{ estudiante.foto.url }}{% else %}{% static 'img/avatar.png' %}{% endif %}" 
+                         class="rounded-circle mb-3" 
+                         alt="Foto del estudiante" 
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                    <h4 class="card-title">{{ estudiante.user.get_full_name }}</h4>
+                    <p class="text-muted">Matrícula: {{ estudiante.matricula }}</p>
+                    <div class="d-grid">
+                        <a href="#" class="btn btn-outline-dark-red">Editar Perfil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas Rápidas -->
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">📈 Promedio General</h5>
+                            <p class="display-2">{{ estudiante.promedio|floatformat:1 }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">📚 Cursos Inscritos</h5>
+                            <p class="display-2">{{ estudiante.cursos_inscritos.count }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial Académico -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-dark-red text-white">
+            <h5 class="mb-0">Historial Académico</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover sortable-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-sort="string">Materia</th>
+                            <th data-sort="string">Profesor</th>
+                            <th data-sort="float">Calificación</th>
+                            <th data-sort="string">Estado</th>
+                            <th data-sort="string">Periodo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for curso in historial %}
+                        <tr>
+                            <td>{{ curso.nombre }}</td>
+                            <td>{{ curso.profesor.get_full_name }}</td>
+                            <td class="fw-bold {% if curso.calificacion >= 6.0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ curso.calificacion|floatformat:1 }}
+                            </td>
+                            <td>
+                                <span class="badge {% if curso.calificacion >= 6.0 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if curso.calificacion >= 6.0 %}Aprobado{% else %}Reprobado{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ curso.periodo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Progreso (Opcional) -->
+    <div class="card shadow">
+        <div class="card-header bg-dark-red text-white">
+            <h5 class="mb-0">Progreso Académico</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="progresoChart" style="height: 300px;"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Scripts para gráficos y ordenamiento -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+
+<script>
+// Ordenamiento de tablas
+$(document).ready(function(){
+    $('.sortable-table').tablesorter();
+});
+
+// Configuración del gráfico
+const ctx = document.getElementById('progresoChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ periodos|safe }},
+        datasets: [{
+            label: 'Promedio por Periodo',
+            data: {{ promedios|safe }},
+            borderColor: '#8C1515',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+{% endblock %}
