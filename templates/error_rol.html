@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-danger">
+        <h4 class="alert-heading">Acceso no autorizado</h4>
+        <p>Requiere rol de <strong>{{ rol_requerido }}</strong></p>
+        <hr>
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Volver</a>
+            
+            <!-- Formulario para logout con POST -->
+            <form action="{% url 'logout' %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    Reingresar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

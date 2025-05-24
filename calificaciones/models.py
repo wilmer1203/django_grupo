@@ -2,33 +2,21 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, User
 from django.conf import settings
 
-# Create your models here.
 class UsuarioPersonalizado(AbstractUser):
-    es_estudiante = models.BooleanField(default=False)
-    es_profesor = models.BooleanField(default=False)
-    es_administrador = models.BooleanField(default=False)
+    ROLES = (
+        ('E', 'Estudiante'),
+        ('P', 'Profesor'),
+        ('A', 'Administrador'),
+    )
+    rol = models.CharField(max_length=1, choices=ROLES, default='E')
     
-class Estudiante(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Relación con usuario
-    numero_identificacion = models.CharField(max_length=20, unique=True)
-    fecha_nacimiento = models.DateField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
-
 class Curso(models.Model):
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=10, unique=True)
-    profesor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.nombre
+    profesor = models.ForeignKey(UsuarioPersonalizado, on_delete=models.SET_NULL, null=True)
 
 class Calificacion(models.Model):
-    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
+    estudiante = models.ForeignKey(UsuarioPersonalizado, on_delete=models.CASCADE)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
-    nota = models.DecimalField(max_digits=5, decimal_places=2)  # Ej: 9.50
+    nota = models.DecimalField(max_digits=5, decimal_places=2)
     fecha = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.estudiante} - {self.curso}: {self.nota}"
