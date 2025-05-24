@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Calificaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% include 'partials/messages.html' %}
+    
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>
+            {% if editar %}
+                <i class="bi bi-pencil-square"></i> Editar Calificación
+            {% else %}
+                <i class="bi bi-journal-plus"></i> Gestión de Calificaciones
+            {% endif %}
+        </h3>
+        {% if not editar %}
+        <a href="{% url 'gestion_calificaciones' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nueva Calificación
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Listado de Calificaciones -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-dark-red text-white">
+            <h5 class="mb-0"><i class="bi bi-list-task"></i> Registros Existentes</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            {% if user.rol == 'P' %}<th>Estudiante</th>{% endif %}
+                            <th>Curso</th>
+                            <th>Nota</th>
+                            <th>Fecha</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for calificacion in calificaciones %}
+                        <tr>
+                            {% if user.rol == 'P' %}
+                            <td>{{ calificacion.estudiante.get_full_name }}</td>
+                            {% endif %}
+                            <td>{{ calificacion.curso.nombre }}</td>
+                            <td class="fw-bold {% if calificacion.nota >= 6.0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ calificacion.nota }}
+                            </td>
+                            <td>{{ calificacion.fecha|date:"d/m/Y" }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'editar_calificacion' calificacion.id %}" 
+                                   class="btn btn-sm btn-warning me-2"
+                                   data-bs-toggle="tooltip" 
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" 
+                                      action="{% url 'eliminar_calificacion' calificacion.id %}" 
+                                      class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-danger"
+                                            data-bs-toggle="tooltip" 
+                                            title="Eliminar"
+                                            onclick="return confirm('¿Está seguro de eliminar esta calificación?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{% if user.rol == 'P' %}5{% else %}4{% endif %}" class="text-center">
+                                <div class="alert alert-info mb-0">
+                                    No se encontraron calificaciones registradas
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    {% if not calificaciones or editar %}
+    <div class="card shadow">
+        <div class="card-header bg-dark-red text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-input-cursor-text"></i>
+                {% if editar %}Editar{% else %}Nueva{% endif %} Calificación
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}origi
+                <div class="row g-3">
+                    <!-- Campo Estudiante (solo para admin) -->
+                    {% if user.rol == 'p' %}
+                    <div class="col-md-6">
+                        <label class="form-label">Estudiante</label>
+                        <select class="form-select" name="estudiante" required>
+                            <option value="">Seleccionar estudiante...</option>
+                            {% for estudiante in estudiantes %}
+                            <option value="{{ estudiante.id }}"
+                                {% if form.estudiante.id == estudiante.id %}selected{% endif %}>
+                                {{ estudiante.get_full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Campo Curso -->
+                    <div class="col-md-6">
+                        <label class="form-label">Curso</label>
+                        <select class="form-select" name="curso" required>
+                            <option value="">Seleccionar curso...</option>
+                            {% for curso in cursos %}
+                            <option value="{{ curso.id }}"
+                                {% if form.curso.id == curso.id %}selected{% endif %}>
+                                {{ curso.nombre }} 
+                                {% if curso.profesor %}
+                                - {{ curso.profesor.get_full_name }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Campo Nota -->
+                    <div class="col-md-6">
+                        <label class="form-label">Nota</label>
+                        <input type="number" 
+                               class="form-control" 
+                               name="nota" 
+                               step="0.01"
+                               min="0" 
+                               max="10"
+                               value="{{ form.nota|default_if_none:'' }}"
+                               required
+                               placeholder="Ej: 8.5">
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i>
+                            {% if editar %}Actualizar{% else %}Guardar{% endif %}
+                        </button>
+                        {% if editar %}
+                        <a href="{% url 'gestion_calificaciones' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Inicializar tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    
+    // Validación de nota en tiempo real
+    document.querySelector('input[name="nota"]')?.addEventListener('change', function(e) {
+        const value = parseFloat(e.target.value)
+        if (value < 0 || value > 10) {
+            alert('La nota debe estar entre 0 y 10')
+            e.target.value = ''
+        }
+    })
+})
+</script>
+{% endblock %}
