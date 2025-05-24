@@ -1,38 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row">
-    <!-- Tarjetas resumen -->
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow">
-            <div class="card-body">
-                <h5 class="card-title">📚 Mis Cursos</h5>
-                <p class="display-4">{{ cursos_count }}</p>
+<div class="container mt-5">
+    <h2>Bienvenido, {{ user.get_full_name }}</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if user.rol == 'E' %}
+                    <a href="{% url 'perfil_estudiante' %}" class="btn btn-primary btn-lg">
+                        Mi Perfil
+                    </a>
+                    {% elif user.rol == 'P' %}
+                    <a href="{% url 'gestion_calificaciones' %}" class="btn btn-success btn-lg">
+                        Registrar Calificaciones
+                    </a>
+                    {% elif user.rol == 'A' %}
+                    <a href="/admin" class="btn btn-success btn-lg">
+                        Panel Administrativo
+                    </a>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-    </div>
-    <!-- Más tarjetas según rol -->
-</div>
-
-<!-- Tabla reciente -->
-<div class="card shadow">
-    <div class="card-header">
-        <h5>Últimas Calificaciones</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Curso</th>
-                        <th>Calificación</th>
-                        <th>Fecha</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Datos dinámicos -->
-                </tbody>
-            </table>
         </div>
     </div>
 </div>

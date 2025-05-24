@@ -9,11 +9,10 @@
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 </head>
 <body class="bg-light">
-    <!-- Navbar inspirado en estilo académico (Stanford) -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark-red shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{% url 'dashboard' %}">
-                <img src="{% static 'img/logo.png' %}" alt="Logo" height="40">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" height="100">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -21,10 +20,18 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if user.is_authenticated %}
-                        {% if user.es_estudiante %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_boletin' %}">Mi Boletín</a></li>
-                        {% elif user.es_profesor %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'mis_cursos' %}">Mis Cursos</a></li>
+                        {% if user.rol == 'E' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'perfil_estudiante' %}">Mi Boletín</a>
+                            </li>
+                        {% elif user.rol == 'P' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'gestion_calificaciones' %}">Mis Cursos</a>
+                            </li>
+                        {% elif user.rol == 'A' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin"> Panel Administrativo</a>
+                        </li>
                         {% endif %}
                     {% endif %}
                 </ul>
@@ -35,31 +42,35 @@
                                 {{ user.get_full_name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+                                {% if user.rol == 'E' %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'perfil_estudiante' %}">Perfil</a>
+                                </li>
+                                {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                <form action="{% url 'logout' %}" method="post" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item">Cerrar Sesión</button>
-                                </form>
+                                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                                    </form>
                                 </li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Ingresar</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Ingresar</a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Contenido principal -->
     <main class="container my-5">
         {% include 'partials/messages.html' %}
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
             <p class="mb-0">&copy; 2024 Sistema de Calificaciones. Todos los derechos reservados.</p>

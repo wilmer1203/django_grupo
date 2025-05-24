@@ -129,5 +129,6 @@ AUTH_USER_MODEL = 'calificaciones.UsuarioPersonalizado'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = 'redireccion_rol'
 LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
