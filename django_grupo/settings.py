@@ -138,10 +138,3 @@ LOGIN_URL = 'login'
 # Directorio donde se almacenarán los archivos estáticos recopilados
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# URL para acceder a los archivos estáticos
-STATIC_URL = '/static/'
-
-# Directorios adicionales donde Django buscará archivos estáticos
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
